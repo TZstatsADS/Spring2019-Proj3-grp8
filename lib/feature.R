@@ -5,7 +5,7 @@
 ### Authors: Chengliang Tang/Tian Zheng
 ### Project 3
 
-feature <- function(LR_dir, HR_dir, n_points=10,train_index){
+feature <- function(LR_dir, HR_dir, n_points=1000,index){
   
   ### Construct process features for training images (LR/HR pairs)
   
@@ -15,54 +15,78 @@ feature <- function(LR_dir, HR_dir, n_points=10,train_index){
   
   ### load libraries
   library("EBImage")
-  library(plyr)
-  n_files<-length(train_index)
+  n_files <- length(index)
+  
+  #print(n_files)
+  
+  get_features_LR<- function(lr_x, lr_y){
+    f_t<- array(0,c(8, 3))
+    LC_t<- LC[c(lr_y-1,lr_y,lr_y+1), c(lr_x-1, lr_x, lr_x+1), ]
+    f_t[1:3, ]<- LC_t[1, , ]
+    f_t[4:5, ]<- LC_t[2, c(1, 3), ]
+    f_t[6:8, ]<- LC_t[3, , ]
+    return(f_t)
+  }
+  
+  
+  get_Labels_HR<- function(hr_x, hr_y){
+    f_t<- array(0, c(4,3))
+    HR_t<- HC[c(hr_y-1, hr_y), c(hr_x-1, hr_x), ]
+    f_t[1:2, ]<- HR_t[1, , ]
+    f_t[3:4, ]<- HR_t[2, , ]
+    return(f_t)
+  }
+  
+  
   ### store feature and responses
   featMat <- array(NA, c(n_files * n_points, 8, 3))
   labMat <- array(NA, c(n_files * n_points, 4, 3))
-  get_feature_lr<-function(index,pad){
-    x<-index[1]+1
-    y<-index[2]+1
-    return(c(pad[x-1,y-1],pad[x,y-1],pad[x+1,y-1],pad[x-1,y],pad[x+1,y],pad[x-1,y-1],pad[x,y-1],pad[x+1,y-1]))
-  }
-  get_feature_hr<-function(index,pad){
-    x<-index[1]
-    y<-index[2]
-    return(c(pad[2*x-1,2*y-1],pad[2*x,2*y-1],pad[2*x-1,2*y],pad[x*2,y*2]))
-  }
+  
   ### read LR/HR image pairs
   for(k in 1:n_files){
-    i=train_index[k]
+    i=index[k]
     imgLR <- readImage(paste0(LR_dir,  "img_", sprintf("%04d", i), ".jpg"))
     imgHR <- readImage(paste0(HR_dir,  "img_", sprintf("%04d", i), ".jpg"))
     ### step 1. sample n_points from imgLR
-    set.seed(200)
-    rownum<- dim(imgLR)[2]
-    colnum<- dim(imgLR)[1]
-    x<-sample(1:colnum,n_points,replace=T)
-    y<-sample(1:rownum,n_points,replace=T)
-    index<-cbind(x,y)
-    ### step 2. for each sampled point in imgLR,
+    lrxd<- dim(imgLR)[2]
+    lryd<- dim(imgLR)[1]
     
-        ### step 2.1. save (the neighbor 8 pixels - central pixel) in featMat
-        ###           tips: padding zeros for boundary points
-    for (j in 1:3){
-      p<-rbind(rep(0,rownum),as.matrix(imgLR[ ,,j]),rep(0,rownum))
-      pad2<-cbind(rep(0,colnum+2),p,rep(0,colnum+2))
-      pad3<-as.matrix(imgHR[,,j])
-      featurelr<-aaply(index,1,get_feature_lr,pad2)
-      featurehr<-aaply(index,1,get_feature_hr,pad3)
-      featMat[((k-1)*n_points+1):(n_points*k),,j]<-featurelr
-      labMat[((k-1)*n_points+1):(n_points*k),,j]<-featurehr
-      
-    }
+    x<- sample(lrxd, n_points, replace=TRUE)
+    y<- sample(lryd, n_points, replace=TRUE)
+    
 
     
+    ### step 2. for each sampled point in imgLR,
     
-        ### step 2.2. save the corresponding 4 sub-pixels of imgHR in labMat
+    ### step 2.1. save (the neighbor 8 pixels - central pixel) in featMat
+    ###           tips: padding zeros for boundary points
+    
+    LC1<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 1]), rep(0, lryd)), rep(0, lrxd+2))
+    LC2<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 2]), rep(0, lryd)), rep(0, lrxd+2))
+    LC3<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 3]), rep(0, lryd)), rep(0, lrxd+2))
+    LC<- array(0, c(lryd+2, lrxd+2, 3))
+    LC[ , , 1]<- LC1
+    LC[ , , 2]<- LC2
+    LC[ , , 3]<- LC3
+    
+    left<- 1000*(k-1)+1
+    right<- 1000*k
+    Features<- mapply(get_features_LR, x+1, y+1)
+    featMat[left:right, , 1]<- t(Features[1:8, ])
+    featMat[left:right, , 2]<- t(Features[9:16, ])
+    featMat[left:right, , 3]<- t(Features[17:24, ])
+    
+    ### step 2.2. save the corresponding 4 sub-pixels of imgHR in labMat
+    HC<- as.array(imgHR)
+    
+    Features<- mapply(get_Labels_HR, 2*x, 2*y)
+    labMat[left:right, , 1]<- t(Features[1:4, ])
+    labMat[left:right, , 2]<- t(Features[5:8, ])
+    labMat[left:right, , 3]<- t(Features[9:12, ])
     
     ### step 3. repeat above for three channels
-      
+    
   }
   return(list(feature = featMat, label = labMat))
 }
+
