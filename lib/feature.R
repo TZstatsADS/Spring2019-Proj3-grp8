@@ -20,21 +20,21 @@ feature <- function(LR_dir, HR_dir, n_points=1000,index){
   #print(n_files)
   
   get_features_LR<- function(lr_x, lr_y){
-    f_t<- array(0,c(8, 3))
-    LC_t<- LC[c(lr_y-1,lr_y,lr_y+1), c(lr_x-1, lr_x, lr_x+1), ]
-    f_t[1:3, ]<- LC_t[1, , ]
-    f_t[4:5, ]<- LC_t[2, c(1, 3), ]
-    f_t[6:8, ]<- LC_t[3, , ]
-    return(f_t)
+    output<- array(0,c(8, 3))
+    Around<- PixelM[c(lr_y-1,lr_y,lr_y+1), c(lr_x-1, lr_x, lr_x+1), ]
+    Scaled<- Around - rep(Around[2,2, ], each=9) 
+    output[1:3, ]<- Scaled[1, , ]
+    output[4:5, ]<- Scaled[2, c(1, 3), ]
+    output[6:8, ]<- Scaled[3, , ]
+    return(output)
   }
-  
-  
   get_Labels_HR<- function(hr_x, hr_y){
-    f_t<- array(0, c(4,3))
-    HR_t<- HC[c(hr_y-1, hr_y), c(hr_x-1, hr_x), ]
-    f_t[1:2, ]<- HR_t[1, , ]
-    f_t[3:4, ]<- HR_t[2, , ]
-    return(f_t)
+    output<- array(0, c(4,3))
+    Target<- Pixel_H[c(hr_y-1, hr_y), c(hr_x-1, hr_x), ]
+    Scaled<- Target - rep(PixelM[hr_y/2+1, hr_x/2+1, ], each=4)
+    output[1:2, ]<- Scaled[1, , ]
+    output[3:4, ]<- Scaled[2, , ]
+    return(output)
   }
   
   
@@ -61,13 +61,13 @@ feature <- function(LR_dir, HR_dir, n_points=1000,index){
     ### step 2.1. save (the neighbor 8 pixels - central pixel) in featMat
     ###           tips: padding zeros for boundary points
     
-    LC1<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 1]), rep(0, lryd)), rep(0, lrxd+2))
-    LC2<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 2]), rep(0, lryd)), rep(0, lrxd+2))
-    LC3<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 3]), rep(0, lryd)), rep(0, lrxd+2))
-    LC<- array(0, c(lryd+2, lrxd+2, 3))
-    LC[ , , 1]<- LC1
-    LC[ , , 2]<- LC2
-    LC[ , , 3]<- LC3
+    M1<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 1]), rep(0, lryd)), rep(0, lrxd+2))
+    M2<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 2]), rep(0, lryd)), rep(0, lrxd+2))
+    M3<- rbind(rep(0, lrxd+2), cbind(rep(0, lryd), as.matrix(imgLR[ , , 3]), rep(0, lryd)), rep(0, lrxd+2))
+    PixelM<- array(0, c(lryd+2, lrxd+2, 3))
+    PixelM[ , , 1]<- M1
+    PixelM[ , , 2]<- M2
+    PixelM[ , , 3]<- M3
     
     left<- 1000*(k-1)+1
     right<- 1000*k
@@ -77,7 +77,7 @@ feature <- function(LR_dir, HR_dir, n_points=1000,index){
     featMat[left:right, , 3]<- t(Features[17:24, ])
     
     ### step 2.2. save the corresponding 4 sub-pixels of imgHR in labMat
-    HC<- as.array(imgHR)
+    Pixel_H<- as.array(imgHR)
     
     Features<- mapply(get_Labels_HR, 2*x, 2*y)
     labMat[left:right, , 1]<- t(Features[1:4, ])
