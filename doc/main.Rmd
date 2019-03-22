@@ -144,7 +144,7 @@ Visualize cross-validation results.
 if(run.cv){
   load("../output/err_cv.RData")
   plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
-       main="Cross Validation Error", type="n", ylim=c(0, 0.25))
+       main="Cross Validation Error", type="n", ylim=c(0.0034, 0.0036))
   points(model_values, err_cv[,1], col="blue", pch=16)
   lines(model_values, err_cv[,1], col="blue")
   arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
@@ -159,8 +159,8 @@ model_best=model_values[1]
 if(run.cv){
   model_best <- model_values[which.min(err_cv[,1])]
 }
-
-par_best <- list(depth=model_best)
+#Using the one standard error rule, the best depth is 7 instead of 11
+par_best <- list(depth=7)
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
