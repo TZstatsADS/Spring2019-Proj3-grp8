@@ -179,22 +179,30 @@ Feed the final training model with the completely holdout testing data.
   + Output: construct high-resolution versions for each low-resolution test image.
 ```{r superresolution}
 source("../lib/superResolution.R")
-test_dir <- "../data/test_set/" # This will be modified for different data sets.
+test_dir <- "../data/train/" # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
 test_HR_dir <- paste(test_dir, "HR/", sep="")
 
 tm_test=NA
 if(run.test){
   load(file="../output/fit_train.RData")
-  tm_test <- system.time(superResolution(train_LR_dir, train_HR_dir, ts,fit_train))
+  tm_test <- system.time(performance<-superResolution(train_LR_dir, train_HR_dir,fit_train,index=ts))
 }
+```
+
+### Summarize the test MSE and PSNR
+
+```{r}
+#test mse
+performance[1]
+#test psnr
+performance[2]
 ```
 
 ### Summarize Running Time
 Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
 ```{r running_time}
 cat("Time for constructing training features=", tm_feature_train[1], "s \n")
-cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
 cat("Time for training model=", tm_train[1], "s \n")
 cat("Time for super-resolution=", tm_test[1], "s \n")
 ```
