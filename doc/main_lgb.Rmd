@@ -153,7 +153,7 @@ par_best_lgb <- list(nr=nr_best, lr = lr_best)
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
-```{r final_train}
+```{r final_train, results="hide"}
 tm_train_lgb=NA
 tm_train_lgb <- system.time(fit_train_lgb <- train.lgb(feat_train, label_train, par_best_lgb))
 save(fit_train_lgb, file="../output/fit_train_lgb.RData")
