@@ -124,7 +124,7 @@ lrseq <- seq(0.01, 0.2, 0.01)
 err_cv_lgb <- cbind(lrseq, array(dim=c(length(lrseq), 2)))
 colnames(err_cv_lgb) <- c("Learning Rate", "mean_cv_error", "sd_cv_error")
 for (i in 1:length(lrseq)){
-  err_cv_lgb[i,2:3] <- cv.lgb(dat_train$feature, dat_train$label, nr = 200,  lr = lrseq[i], K = 5)
+  err_cv_lgb[i,2:3] <- cv.lgb(dat_train$feature, dat_train$label, nr = 200, lr = lrseq[i], K = 5)
 }
 
 save(err_cv_lgb, file="../output/err_cv_lgb_1.RData")
@@ -153,7 +153,7 @@ par_best_lgb <- list(nr=nr_best, lr = lr_best)
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
-```{r final_train, results="hide"}
+```{r final_train, eval=F}
 tm_train_lgb=NA
 tm_train_lgb <- system.time(fit_train_lgb <- train.lgb(feat_train, label_train, par_best_lgb))
 save(fit_train_lgb, file="../output/fit_train_lgb.RData")
@@ -167,15 +167,15 @@ Feed the final training model with the completely holdout testing data.
   + Input: an R object that contains tuned predictors.
   + Output: construct high-resolution versions for each low-resolution test image.
 ```{r superresolution}
-source("../lib/superResolution.R")
+source("../lib/superResolution_lgb.R")
 test_dir <- "../data/train/" # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
 test_HR_dir <- paste(test_dir, "HR/", sep="")
 tm_test=NA
-if(run.test){
-  load(file="../output/fit_train.RData")
-  tm_test <- system.time(performance<-superResolution(train_LR_dir, train_HR_dir,fit_train,index=ts))
-}
+
+load(file="../output/fit_train_lgb.RData")
+tm_test <- system.time(performance<-superResolution_lgb(train_LR_dir, train_HR_dir,fit_train_lgb,index=ts))
+
 ```
 
 ### Summarize the test MSE and PSNR

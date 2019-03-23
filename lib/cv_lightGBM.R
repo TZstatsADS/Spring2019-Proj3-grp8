@@ -29,7 +29,7 @@ nrseq <- seq(10, 300, 10)
 err_cv_lgb <- cbind(nrseq, array(dim=c(length(nrseq), 2)))
 colnames(err_cv_lgb) <- c("Num_iterations", "mean_cv_error", "sd_cv_error")
 for (i in 1:length(nrseq)){
-  err_cv_lgb[i,2:3] <- cv.lgb(dat_train$feature, dat_train$label, nr = nrseq[i], , K = 5)
+  err_cv_lgb[i,2:3] <- cv.lgb(dat_train$feature, dat_train$label, nr = nrseq[i], lr, K = 5)
 }
 
 save(err_cv_lgb, file="../output/err_cv_lgb.RData")
