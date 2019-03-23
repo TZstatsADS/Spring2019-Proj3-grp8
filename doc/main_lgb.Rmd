@@ -93,6 +93,11 @@ if(run.feature.train){
 save(dat_train, file="../output/feature_train.RData")
 ```
 
+```{r}
+load("../output/feature_train.RData")
+feat_train <- dat_train$feature
+label_train <- dat_train$label
+```
 
 ### Step 4: Train a regression model with training features and responses
 Call the train model and test model from library. 
@@ -144,14 +149,14 @@ plot(x,y, xlab="Learning rate", ylab="CV Error",
 
 lr_best <- err_cv_lgb[,1][which.min(err_cv_lgb[,2])]
 nr_best <- 200
-par_best <- list(nr=nr_best, lr = lr_best)
+par_best_lgb <- list(nr=nr_best, lr = lr_best)
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
 ```{r final_train}
-tm_train=NA
-tm_train <- system.time(fit_train <- train(feat_train, label_train, par_best))
-save(fit_train, file="../output/fit_train.RData")
+tm_train_lgb=NA
+tm_train_lgb <- system.time(fit_train_lgb <- train.lgb(feat_train, label_train, par_best_lgb))
+save(fit_train_lgb, file="../output/fit_train_lgb.RData")
 ```
 
 ### Step 5: Super-resolution for test images
