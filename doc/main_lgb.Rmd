@@ -85,11 +85,11 @@ train_ind<-setdiff(1:1500,ts)#index of training set
 ```{r feature, eval=F}
 source("../lib/feature.R")
 tm_feature_train <- NA
-if(run.feature.train){
+
   tm_feature_train <- system.time(dat_train <- feature(train_LR_dir, train_HR_dir,index=train_ind))
   feat_train <- dat_train$feature
   label_train <- dat_train$label
-}
+
 save(dat_train, file="../output/feature_train.RData")
 ```
 

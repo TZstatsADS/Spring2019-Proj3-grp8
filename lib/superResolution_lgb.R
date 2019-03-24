@@ -29,7 +29,7 @@ superResolution_lgb <- function(LR_dir, HR_dir, modelList,index){
   for(k in 1:n_files){
     i=index[k]
     imgLR <- readImage(paste0(LR_dir,  "img", "_", sprintf("%04d", i), ".jpg"))
-    pathHR <- paste0(HR_dir,  "img", "_", sprintf("%04d", i), ".jpg")
+    #pathHR <- paste0(HR_dir,  "img", "_", sprintf("%04d", i), ".jpg")
     featMat <- array(NA, c(dim(imgLR)[1] * dim(imgLR)[2], 8, 3))
     
     ### step 1. for each pixel and each channel in imgLR:
@@ -72,7 +72,7 @@ superResolution_lgb <- function(LR_dir, HR_dir, modelList,index){
     
     img_out<- Image(imgoutputhr, colormode="Color")
     display(img_out)
-    writeImage(img_out, paste0("../data/train/testlgbHR/",  "img", "_", sprintf("%04d", i), ".jpg"))
+    writeImage(img_out, paste0("../data/train/test_lightGBM_HR/",  "img", "_", sprintf("%04d", i), ".jpg"))
     ### step 4. report test MSE and PSNR
     testlgbimgHR <- readImage(paste0(HR_dir,  "img", "_", sprintf("%04d", i), ".jpg"))
     mse<-c(mse,mean((imgoutputhr - testlgbimgHR)^2))

@@ -32,7 +32,7 @@ train.lgb <- function(dat_train, label_train, par=NULL){
     labMat <- label_train[, c1, c2]
     fit_lgb <- lightgbm(data=featMat, label=labMat, objective="regression", nrounds = nr, learning_rate = lr)
     #best_iter <- gbm.perf(fit_gbm, method="OOB", plot.it = FALSE)
-    modelList[[i]] <- list(fit=fit_lgb, iter=nr)
+    modelList[[i]] <- list(fit=fit_lgb)
   }
   
   return(modelList)
