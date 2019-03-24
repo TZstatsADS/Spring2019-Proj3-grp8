@@ -159,5 +159,40 @@ save(fit_train, file="../output/fit_trainXG.RData")
 
 ### Step 5: Super-resolution for test images
   
-unfinished
+Feed the final training model with the completely holdout testing data. 
++ `superResolution.R`
+  + Input: a path that points to the folder of low-resolution test images.
+  + Input: a path that points to the folder (empty) of high-resolution test images.
+  + Input: an R object that contains tuned predictors.
+  + Output: construct high-resolution versions for each low-resolution test image.
+```{r superresolution}
+source("../lib/superResolutionXG.R")
+test_dir <- "../data/train/" # This will be modified for different data sets.
+test_LR_dir <- paste(test_dir, "LR/", sep="")
+test_HR_dir <- paste(test_dir, "HR/", sep="")
+
+tm_test=NA
+if(run.test){
+  load(file="../output/fit_trainXG.RData")
+  tm_test <- system.time(performance<-superResolutionXG(train_LR_dir, train_HR_dir,fit_train,index=ts))
+}
+```
+
+### Summarize the test MSE and PSNR
+
+```{r}
+#test mse
+performance[1]
+#test psnr
+performance[2]
+```
+
+### Summarize Running Time
+Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
+```{r running_time}
+cat("Time for training model=", tm_train[1], "s \n")
+cat("Time for super-resolution=", tm_test[1], "s \n")
+```
+
+
 
