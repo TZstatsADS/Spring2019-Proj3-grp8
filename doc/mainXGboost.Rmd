@@ -61,8 +61,9 @@ run.feature.test=TRUE # process features for test set
 Using cross-validation or independent test set evaluation, we compare the performance of models with different specifications. In this example, we use GBM with different `depth`. In the following chunk, we list, in a vector, setups (in this case, `depth`) corresponding to models that we will compare. In your project, you might compare very different classifiers. You can assign them numerical IDs and labels specific to your project. 
 
 ```{r model_setup}
-model_values <- seq(3, 11, 2)
-model_labels = paste("GBM with depth =", model_values)
+model_values <- c(2,5,10,100)
+model_labels = paste("XGB with nr =", model_values)
+
 ```
 
 ### Step 2: import training images class labels.
@@ -131,7 +132,7 @@ Visualize cross-validation results.
 if(run.cv){
   load("../output/err_cvXGboost.RData")
   plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
-       main="Cross Validation Error", type="n", ylim=c(0, 0.01))
+       main="Cross Validation Error", type="n", ylim=c(0.0027, 0.0029))
   points(model_values, err_cv[,1], col="blue", pch=16)
   lines(model_values, err_cv[,1], col="blue")
   arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
@@ -144,7 +145,7 @@ if(run.cv){
 ```{r best_model}
 model_best=model_values[1]
 if(run.cv){
-  model_best <- model_values[which.min(err_cv[,1])]
+  model_best <- 5
 }
 
 par_best <- list(nr=model_best)
