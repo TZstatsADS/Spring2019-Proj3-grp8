@@ -1,0 +1,163 @@
+---
+title: "Project 3 - Example Main Script"
+author: "Chengliang Tang, Tian Zheng"
+output: html_notebook
+---
+
+In your final repo, there should be an R markdown file that organizes **all computational steps** for evaluating your proposed image classification framework. 
+
+This file is currently a template for running evaluation experiments of image analysis (or any predictive modeling). You should update it according to your codes but following precisely the same structure. 
+
+```{r}
+if(!require("EBImage")){
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("EBImage")
+}
+
+if(!require("gbm")){
+  install.packages("gbm")
+}
+
+library("EBImage")
+library("gbm")
+
+if(!require(devtools)) install.packages("devtools")
+devtools::install_github("rstudio/keras") 
+library(keras)
+```
+
+
+### Step 0: specify directories.
+
+Set the working directory to the image folder. Specify the training and the testing set. For data without an independent test/validation set, you need to create your own testing data by random subsampling. In order to obain reproducible results, set.seed() whenever randomization is used. 
+
+```{r wkdir, eval=FALSE}
+set.seed(2018)
+# use relative path for reproducibility
+```
+
+Provide directories for training images. Low-resolution (LR) image set and High-resolution (HR) image set will be in different subfolders. 
+```{r}
+train_dir <- "../data/train/" # This will be modified for different data sets.
+train_LR_dir <- paste(train_dir, "LR/", sep="")
+train_HR_dir <- paste(train_dir, "HR/", sep="")
+train_label_path <- paste(train_dir, "label.csv", sep="") 
+```
+
+### Step 1: set up controls for evaluation experiments.
+
+In this chunk, we have a set of controls for the evaluation experiments. 
+
++ (T/F) cross-validation on the training set
++ (number) K, the number of CV folds
++ (T/F) process features for training set
++ (T/F) run evaluation on an independent test set
++ (T/F) process features for test set
+
+```{r exp_setup}
+run.cv=TRUE # run cross-validation on the training set
+K <- 5  # number of CV folds
+run.feature.train=TRUE # process features for training set
+run.test=TRUE # run evaluation on an independent test set
+run.feature.test=TRUE # process features for test set
+```
+
+Using cross-validation or independent test set evaluation, we compare the performance of models with different specifications. In this example, we use GBM with different `depth`. In the following chunk, we list, in a vector, setups (in this case, `depth`) corresponding to models that we will compare. In your project, you might compare very different classifiers. You can assign them numerical IDs and labels specific to your project. 
+
+```{r model_setup}
+
+
+```
+
+### Step 2: import training images class labels.
+
+We provide extra information of image label: car (0), flower (1), market (2). These labels are not necessary for your model.
+
+```{r train_label}
+extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
+```
+
+### Step2.5 split the training/test set according to lables
+
+```{r}
+ts<-c()#index of test set
+l<-unique(extra_label$Label)
+label<-extra_label$Label
+for(i in l){
+  train_sub<-which(label==i)
+  ts<-c(ts,sample(train_sub,length(train_sub)/5))
+}
+train_ind<-setdiff(1:1500,ts)#index of training set
+```
+
+### Step 3: construct features and responses
+
+```{r}
+load("../output/feature_train.RData")
+feat_train=dat_train$feature
+label_train=dat_train$label
+```
+
+
+### Step 4: Train a regression model with training features and responses
+Call the train model and test model from library. 
+
+`train.R` and `test.R` should be wrappers for all your model training steps and your classification/prediction steps. 
++ `train.R`
+  + Input: a path that points to the training set features and responses.
+  + Output: an RData file that contains trained classifiers in the forms of R objects: models/settings/links to external trained configurations.
++ `test.R`
+  + Input: a path that points to the test set features.
+  + Input: an R object that contains a trained classifier.
+  + Output: an R object of response predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
+```{r loadlib}
+source("../lib/trainNN.R")
+source("../lib/testNN.R")
+```
+
+
+* Train the model with the entire training set using the selected model (model parameter) via cross-validation.
+```{r final_train}
+tm_train=NA
+tm_train <- system.time(trainNN(feat_train, label_train))
+```
+
+### Step 5: Super-resolution for test images
+  
+Feed the final training model with the completely holdout testing data. 
++ `superResolution.R`
+  + Input: a path that points to the folder of low-resolution test images.
+  + Input: a path that points to the folder (empty) of high-resolution test images.
+  + Input: an R object that contains tuned predictors.
+  + Output: construct high-resolution versions for each low-resolution test image.
+```{r superresolution}
+source("../lib/superResolutionNN.R")
+test_dir <- "../data/train/" # This will be modified for different data sets.
+test_LR_dir <- paste(test_dir, "LR/", sep="")
+test_HR_dir <- paste(test_dir, "HR/", sep="")
+
+modelList <- list()
+for (i in 1:12){
+  print(i)
+  modelList[[i]] <- load_model_hdf5(paste(paste("../output/NNmodels/NNmodel", toString(i), sep=""), ".h5", sep=""))
+}
+
+tm_test=NA
+tm_test <- system.time(performance <- superResolutionNN(train_LR_dir, train_HR_dir, modelList, index=ts))
+```
+
+### Summarize the test MSE and PSNR
+
+```{r}
+#test mse
+performance[1]
+#test psnr
+performance[2]
+```
+
+### Summarize Running Time
+Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
+```{r running_time}
+cat("Time for training model=", tm_train[1], "s \n")
+cat("Time for super-resolution=", tm_test[1], "s \n")
+```
