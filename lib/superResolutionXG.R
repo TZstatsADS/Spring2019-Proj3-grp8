@@ -70,7 +70,6 @@ superResolutionXG <- function(LR_dir, HR_dir, modelList,index){
     }
     
     img_out<- Image(imgoutputhr, colormode="Color")
-    display(img_out)
     writeImage(img_out, paste0("../data/train/testHRXG/",  "img", "_", sprintf("%04d", i), ".jpg"))
     ### step 4. report test MSE and PSNR
     testimgHR <- readImage(paste0(HR_dir,  "img", "_", sprintf("%04d", i), ".jpg"))
