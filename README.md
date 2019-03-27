@@ -23,7 +23,7 @@ Term: Spring 2019
 
 + Vitha, Matthew 
 
-+ Wang, Yujie: trained, tested, performed cross validation, produced super resolution images using light GBM model. 
++ Wang, Yujie: trained, tested, performed cross validation for parameter tuning, produced super resolution images using light GBM model. 
 
 + Zhao, Xiaoxi: complete the baseline model with finishing feature.R, superresolution.R and change the main.R to do the train-validation set splitting; tune the baseline model using cross validation; Improve the XGBoost model by parameter tuning:eta, max_depth and nrounds.Write the final code for superrosolution.
 
