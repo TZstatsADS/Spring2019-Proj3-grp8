@@ -17,7 +17,7 @@ Term: Spring 2019
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
-+ Chen, Xishi
++ Chen, Xishi: complete the Xgboost model including finishing mainXGboost.rmd, cross_validationXGboost.r, superResolutionXG.r, trainXGboost.r and testXGboost.r; Try different parameters to improve the performance of the model.
 
 + Ren, Claire 
 
