@@ -5,7 +5,7 @@
 ### Author: Chengliang Tang
 ### Project 3
 
-superResolution <- function(LR_dir, HR_dir, modelList){
+superResolution <- function(LR_dir, HR_dir, modelList,index){
   
   ### Construct high-resolution images from low-resolution images with trained predictor
   
@@ -14,7 +14,7 @@ superResolution <- function(LR_dir, HR_dir, modelList){
   
   ### load libraries
   library("EBImage")
-  n_files <- length(list.files(LR_dir))
+  n_files <- length(index)
   get_features_LR<- function(lr_x, lr_y){
     output<- array(0,c(8, 3))
     Around<- PixelM[c(lr_y-1,lr_y,lr_y+1), c(lr_x-1, lr_x, lr_x+1), ]
@@ -24,9 +24,10 @@ superResolution <- function(LR_dir, HR_dir, modelList){
     output[6:8, ]<- Scaled[3, , ]
     return(output)
   }
-  #mse<-c()
+  mse<-c()
   ### read LR/HR image pairs
-  for(i in 1:n_files){
+  for(k in 1:n_files){
+    i<-index[k]
     imgLR <- readImage(paste0(LR_dir,  "img", "_", sprintf("%04d", i), ".jpg"))
     pathHR <- paste0(HR_dir,  "img", "_", sprintf("%04d", i), ".jpg")
     featMat <- array(NA, c(dim(imgLR)[1] * dim(imgLR)[2], 8, 3))
@@ -69,15 +70,15 @@ superResolution <- function(LR_dir, HR_dir, modelList){
     }
     
     img_out<- Image(imgoutputhr, colormode="Color")
-    writeImage(img_out, pathHR)
+    writeImage(img_out, paste0("../data/train/testHR/",  "img", "_", sprintf("%04d", i), ".jpg"))
     ### step 4. report test MSE and PSNR
-    #testimgHR <- readImage(paste0(HR_dir,  "img", "_", sprintf("%04d", i), ".jpg"))
-    #mse<-c(mse,mean((imgoutputhr - testimgHR)^2))
+    testimgHR <- readImage(paste0(HR_dir,  "img", "_", sprintf("%04d", i), ".jpg"))
+    mse<-c(mse,mean((imgoutputhr - testimgHR)^2))
     
     
   }
-  #testmse<-mean(mse)
-  #testpsnr<- -10*log10(testmse)
-  #return(c(testmse,testpsnr))
+  testmse<-mean(mse)
+  testpsnr<- -10*log10(testmse)
+  return(c(testmse,testpsnr))
   
 }

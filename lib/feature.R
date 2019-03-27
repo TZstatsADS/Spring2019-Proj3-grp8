@@ -5,7 +5,7 @@
 ### Authors: Chengliang Tang/Tian Zheng
 ### Project 3
 
-feature <- function(LR_dir, HR_dir, n_points=1000){
+feature <- function(LR_dir, HR_dir, n_points=1000,index){
   
   ### Construct process features for training images (LR/HR pairs)
   
@@ -15,7 +15,7 @@ feature <- function(LR_dir, HR_dir, n_points=1000){
   
   ### load libraries
   library("EBImage")
-  n_files <- length(list.files(LR_dir))
+  n_files <- length(index)
   
   #print(n_files)
   
@@ -43,7 +43,8 @@ feature <- function(LR_dir, HR_dir, n_points=1000){
   labMat <- array(NA, c(n_files * n_points, 4, 3))
   
   ### read LR/HR image pairs
-  for(i in 1:n_files){
+  for(k in 1:n_files){
+    i=index[k]
     imgLR <- readImage(paste0(LR_dir,  "img_", sprintf("%04d", i), ".jpg"))
     imgHR <- readImage(paste0(HR_dir,  "img_", sprintf("%04d", i), ".jpg"))
     ### step 1. sample n_points from imgLR
@@ -68,8 +69,8 @@ feature <- function(LR_dir, HR_dir, n_points=1000){
     PixelM[ , , 2]<- M2
     PixelM[ , , 3]<- M3
     
-    left<- 1000*(i-1)+1
-    right<- 1000*i
+    left<- 1000*(k-1)+1
+    right<- 1000*k
     Features<- mapply(get_features_LR, x+1, y+1)
     featMat[left:right, , 1]<- t(Features[1:8, ])
     featMat[left:right, , 2]<- t(Features[9:16, ])
