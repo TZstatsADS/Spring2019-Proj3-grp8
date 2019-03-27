@@ -30,10 +30,11 @@ trainXG <- function(dat_train, label_train, par=NULL){
   
   ### Train with gradient boosting model
   if(is.null(par)){
-    nr<- 10
+    nr <- 100
   } else {
-    nr<- par$nr
+    nr <- par$nr
   }
+  
   ### the dimension of response arrat is * x 4 x 3, which requires 12 classifiers
   ### this part can be parallelized
   for (i in 1:12){
@@ -44,15 +45,11 @@ trainXG <- function(dat_train, label_train, par=NULL){
     labMat <- label_train[, c1, c2]
     fit_improved <- xgboost(data = as.matrix(featMat), 
                             label = as.matrix(labMat), 
-                            booster = "gblinear", 
-                            eta = 0.1,
-                            nrounds = nr, 
-                            max_depth=7,
-                            verbose = FALSE, 
+                            booster = "gblinear",
+                            nrounds = nr,  
                             objective = "reg:linear", 
-                            eval_metric = "rmse", 
-                            lambda = 1, 
-                            alpha = 0)
+                            eval_metric = "rmse",
+                            eta=0.5,max_depth=7)
     modelList[[i]] <- list(fit=fit_improved, iter=par)
   }
   
