@@ -7,7 +7,7 @@ Term: Spring 2019
 
 + Team 8
 + Team members
-	+ xz2740 Xiaoxi
+	+ xz2740 Xiaoxi Zhao
 	+ team member 2
 	+ team member 3
 	+ team member 4
