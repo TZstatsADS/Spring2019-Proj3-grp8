@@ -19,7 +19,7 @@ Term: Spring 2019
 
 + Chen, Xishi: complete the Xgboost model including finishing mainXGboost.rmd, cross_validationXGboost.r, superResolutionXG.r, trainXGboost.r and testXGboost.r; Try different parameters to improve the performance of the model.
 
-+ Ren, Claire 
++ Ren, Xueqi: complete the Multi-Layer Perceptron model (basic neural network) including finihsing mainNN.Rmd, superResolutionNN.R, trainNN.R and testNN.R. 
 
 + Vitha, Matthew: attempted to train a GAN NN for predictions but came up with complications. Code for the network setup is in Network-gan.py, while the train file is in train_gan.py
 
