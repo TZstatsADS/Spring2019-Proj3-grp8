@@ -19,13 +19,13 @@ Term: Spring 2019
 
 + Chen, Xishi
 
-+ Ren, Xueqi: trained, tested, produced super resolution images using a Multi-Layer Perceptron from keras package.
++ Ren, Claire 
 
 + Vitha, Matthew 
 
 + Wang, Yujie: trained, tested, performed cross validation, produced super resolution images using light GBM model. 
 
-+ Zhao, Xiaoxi 
++ Zhao, Xiaoxi: complete the baseline model with finishing feature.R, superresolution.R and change the main.R to do the train-validation set splitting; tune the baseline model using cross validation; Improve the XGBoost model by parameter tuning:eta, max_depth and nrounds.Write the final code for superrosolution.
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
