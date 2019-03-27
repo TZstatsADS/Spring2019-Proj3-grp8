@@ -19,7 +19,7 @@ Term: Spring 2019
 
 + Chen, Xishi: complete the Xgboost model including finishing mainXGboost.rmd, cross_validationXGboost.r, superResolutionXG.r, trainXGboost.r and testXGboost.r; Try different parameters to improve the performance of the model.
 
-+ Ren, Claire 
++ Ren, Xueqi: complete the Multi-Layer Perceptron model (basic neural network) including finihsing mainNN.rmd, superResolutionNN.r, trainNN.r and testNN.r. 
 
 + Vitha, Matthew 
 
