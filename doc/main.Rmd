@@ -1,7 +1,10 @@
 ---
 title: "Project 3 - Example Main Script"
 author: "Chengliang Tang, Tian Zheng"
-output: html_notebook
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 In your final repo, there should be an R markdown file that organizes **all computational steps** for evaluating your proposed image classification framework. 
@@ -51,9 +54,9 @@ In this chunk, we have a set of controls for the evaluation experiments.
 + (T/F) process features for test set
 
 ```{r exp_setup}
-run.cv=TRUE # run cross-validation on the training set
+run.cv=FALSE # run cross-validation on the training set
 K <- 5  # number of CV folds
-run.feature.train=TRUE # process features for training set
+run.feature.train=T # process features for training set
 run.test=TRUE # run evaluation on an independent test set
 run.feature.test=TRUE # process features for test set
 ```
@@ -76,14 +79,14 @@ extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
 ### Step2.5 split the training/test set according to lables
 
 ```{r}
-ts<-c()#index of test set
-l<-unique(extra_label$Label)
-label<-extra_label$Label
-for(i in l){
-  train_sub<-which(label==i)
-  ts<-c(ts,sample(train_sub,length(train_sub)/5))
-}
-train_ind<-setdiff(1:1500,ts)#index of training set
+#ts<-c()#index of test set
+#l<-unique(extra_label$Label)
+#label<-extra_label$Label
+#for(i in l){
+ # train_sub<-which(label==i)
+#  ts<-c(ts,sample(train_sub,length(train_sub)/5))
+#}
+#train_ind<-setdiff(1:1500,ts)#index of training set
 ```
 
 ### Step 3: construct features and responses
@@ -95,16 +98,19 @@ train_ind<-setdiff(1:1500,ts)#index of training set
   + Output: an RData file that contains extracted features and corresponding responses
 
 ```{r feature}
-
 source("../lib/feature.R")
 tm_feature_train <- NA
 if(run.feature.train){
-  tm_feature_train <- system.time(dat_train <- feature(train_LR_dir, train_HR_dir,index=train_ind))
+  tm_feature_train <- system.time(dat_train <- feature(train_LR_dir, train_HR_dir))
   feat_train <- dat_train$feature
   label_train <- dat_train$label
+  save(dat_train, file="../output/feature_train.RData")
 }
 
-save(dat_train, file="../output/feature_train.RData")
+
+load("../output/feature_train.RData")
+feat_train=dat_train$feature
+label_train=dat_train$label
 ```
 
 
@@ -141,7 +147,6 @@ if(run.cv){
 
 Visualize cross-validation results. 
 ```{r cv_vis}
-if(run.cv){
   load("../output/err_cv.RData")
   plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
        main="Cross Validation Error", type="n", ylim=c(0.0034, 0.0036))
@@ -149,7 +154,7 @@ if(run.cv){
   lines(model_values, err_cv[,1], col="blue")
   arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
         length=0.1, angle=90, code=3)
-}
+
 ```
 
 
@@ -179,31 +184,22 @@ Feed the final training model with the completely holdout testing data.
   + Output: construct high-resolution versions for each low-resolution test image.
 ```{r superresolution}
 source("../lib/superResolution.R")
-test_dir <- "../data/train/" # This will be modified for different data sets.
+test_dir <- "../data/test/" # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
 test_HR_dir <- paste(test_dir, "HR/", sep="")
 
 tm_test=NA
 if(run.test){
   load(file="../output/fit_train.RData")
-  tm_test <- system.time(performance<-superResolution(train_LR_dir, train_HR_dir,fit_train,index=ts))
+  tm_test <- system.time(performance<-superResolution(test_LR_dir, test_HR_dir,fit_train))
 }
-```
-
-### Summarize the test MSE and PSNR
-
-```{r}
-#test mse
-performance[1]
-#test psnr
-performance[2]
 ```
 
 ### Summarize Running Time
 Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
 ```{r running_time}
-cat("Time for constructing training features=", tm_feature_train[1], "s \n")
-cat("Time for training model=", tm_train[1], "s \n")
+#cat("Time for constructing training features=", tm_feature_train[1], "s \n")
+#cat("Time for training model=", tm_train[1], "s \n")
 cat("Time for super-resolution=", tm_test[1], "s \n")
 ```
 
