@@ -8,7 +8,7 @@ Term: Spring 2019
 + Team 8
 + Team members
 	+ Chen, Xishi xc2455@columbia.edu
-	+ Ren, Claire xr2134@columbia.edu
+	+ Ren, Xueqi xr2134@columbia.edu
 	+ Vitha, Matthew mv2705@columbia.edu
 	+ Wang, Yujie yw3285@columbia.edu
 	+ Zhao, Xiaoxi xz2740@columbia.edu
