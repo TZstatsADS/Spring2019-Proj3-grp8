@@ -19,7 +19,7 @@ Term: Spring 2019
 
 + Chen, Xishi
 
-+ Ren, Claire 
++ Ren, Xueqi: trained, tested, produced super resolution images using a Multi-Layer Perceptron from keras package.
 
 + Vitha, Matthew 
 
